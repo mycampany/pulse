@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Global Pulse - News Website</title>
+<style>
+  body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background-color: #0d1117;
+    color: #f0f6fc;
+  }
+
+  header {
+    background-color: #161b22;
+    padding: 15px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+
+  header h1 {
+    color: #58a6ff;
+    font-size: 1.5em;
+    margin: 0;
+  }
+
+  nav a {
+    color: #f0f6fc;
+    text-decoration: none;
+    margin-left: 20px;
+    font-weight: 500;
+  }
+
+  nav a:hover {
+    color: #58a6ff;
+  }
+
+  .container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 15px;
+  }
+
+  .search-bar {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+  }
+
+  .search-bar input {
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    background-color: #161b22;
+    color: #f0f6fc;
+  }
+
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+
+  .card {
+    background-color: #161b22;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s;
+  }
+
+  .card:hover {
+    transform: scale(1.03);
+  }
+
+  .card img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+  }
+
+  .card-content {
+    padding: 15px;
+    flex-grow: 1;
+  }
+
+  .card-content h3 {
+    margin: 0 0 10px;
+    color: #58a6ff;
+  }
+
+  .card-content p {
+    font-size: 0.9em;
+    color: #c9d1d9;
+  }
+
+  .add-form {
+    margin-top: 40px;
+    background-color: #161b22;
+    padding: 20px;
+    border-radius: 10px;
+  }
+
+  .add-form h2 {
+    color: #58a6ff;
+  }
+
+  input, textarea, select, button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    background-color: #0d1117;
+    color: #f0f6fc;
+  }
+
+  button {
+    background-color: #238636;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #2ea043;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px;
+    color: #8b949e;
+    margin-top: 40px;
+    border-top: 1px solid #30363d;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌐 Global Pulse</h1>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#add">Add News</a>
+  </nav>
+</header>
+
+<div class="container">
+  <section id="home">
+    <h2>Latest News</h2>
+
+    <div class="search-bar">
+      <input type="text" id="search" placeholder="Search news by title or category..." oninput="searchNews()">
+    </div>
+
+    <div class="news-grid" id="newsGrid"></div>
+  </section>
+
+  <section id="add" class="add-form">
+    <h2>Add Your News</h2>
+    <input type="text" id="title" placeholder="News Title" required />
+    <input type="text" id="image" placeholder="Image URL" required />
+    <textarea id="description" rows="3" placeholder="Short Description"></textarea>
+    <select id="category">
+      <option value="Technology">Technology</option>
+      <option value="Sports">Sports</option>
+      <option value="World">World</option>
+    </select>
+    <button onclick="addNews()">Publish</button>
+  </section>
+</div>
+
+<footer>© 2025 Global Pulse | Stay Informed, Stay Ahead</footer>
+
+<script>
+  let newsList = JSON.parse(localStorage.getItem("newsList")) || [
+    {
+      title: "AI Revolution: The Next Big Leap",
+      image: "https://images.unsplash.com/photo-1581091012184-5c8af8a9b9c3",
+      description: "Experts predict a transformative decade as AI reshapes industries worldwide.",
+      category: "Technology"
+    },
+    {
+      title: "Championship Glory: India Wins the Series",
+      image: "https://images.unsplash.com/photo-1505842465776-3d90f616310d",
+      description: "A stunning performance leads India to victory in a thrilling final match.",
+      category: "Sports"
+    },
+    {
+      title: "Global Climate Summit 2025: Key Agreements Reached",
+      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+      description: "Leaders from 190 nations unite to accelerate carbon neutrality efforts.",
+      category: "World"
+    }
+  ];
+
+  function displayNews(list = newsList) {
+    const grid = document.getElementById("newsGrid");
+    grid.innerHTML = "";
+    if (list.length === 0) {
+      grid.innerHTML = "<p>No news found!</p>";
+      return;
+    }
+    list.forEach((news) => {
+      const card = document.createElement("div");
+      card.className = "card";
+      card.innerHTML = `
+        <img src="${news.image}" alt="${news.title}">
+        <div class="card-content">
+          <h3>${news.title}</h3>
+          <p>${news.description}</p>
+          <small>Category: ${news.category}</small>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function addNews() {
+    const title = document.getElementById("title").value.trim();
+    const image = document.getElementById("image").value.trim();
+    const description = document.getElementById("description").value.trim();
+    const category = document.getElementById("category").value;
+
+    if (!title || !image || !description) {
+      alert("Please fill out all fields!");
+      return;
+    }
+
+    const newNews = { title, image, description, category };
+    newsList.unshift(newNews);
+    localStorage.setItem("newsList", JSON.stringify(newsList));
+    displayNews();
+    document.getElementById("title").value = "";
+    document.getElementById("image").value = "";
+    document.getElementById("description").value = "";
+    alert("News Published Successfully!");
+  }
+
+  function searchNews() {
+    const query = document.getElementById("search").value.toLowerCase();
+    const filtered = newsList.filter(n =>
+      n.title.toLowerCase().includes(query) ||
+      n.description.toLowerCase().includes(query) ||
+      n.category.toLowerCase().includes(query)
+    );
+    displayNews(filtered);
+  }
+
+  displayNews();
+</script>
+</body>
+</html>
